@@ -1,0 +1,57 @@
+---
+- name: install necessary packages
+  apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    state: latest
+    update_cache: yes
+    force_apt_get: yes
+
+- name: add necessary apt keys if host is proxy
+  apt_key:
+    url: https://packagecloud.io/netdata/netdata/gpgkey
+    state: present
+  environment:
+    http_proxy: '{{ proxy.http | default('') }}'
+    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+
+- name: add necessary apt keys if host is not proxy
+  apt_key:
+    url: https://packagecloud.io/netdata/netdata/gpgkey
+    state: present
+  environment:
+    http_proxy: '{{ proxy.http | default('') }}'
+    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+
+- name: add netdata necessary repositories
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+    filename: netdata
+  with_items:
+    - "deb https://packagecloud.io/netdata/netdata/debian/ {{ ansible_distribution_release }} main"
+    - "deb-src https://packagecloud.io/netdata/netdata/debian/ {{ ansible_distribution_release }} main"
+  environment:
+    http_proxy: '{{ proxy.http | default('') }}'
+    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+
+- name: install netdata package
+  apt:
+    name: netdata
+    force_apt_get: yes
+    update_cache: yes
+  environment:
+    http_proxy: '{{ proxy.http | default('') }}'
+    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+
+- name: configure netdata
+  template:
+    src: netdata.conf.j2
+    dest: /etc/netdata/netdata.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - enable and start netdata

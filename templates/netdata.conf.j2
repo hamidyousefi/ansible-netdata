@@ -1,0 +1,13 @@
+[global]
+run as user                 = netdata
+history                     = 3600
+process scheduling policy   = idle
+OOM score                   = 1000
+
+[web]
+web files owner             = root
+web files group             = netdata
+bind to                     = {{ ansible_host }}
+
+[statsd]
+enabled                     = no
