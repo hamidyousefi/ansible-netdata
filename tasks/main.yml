@@ -9,21 +9,13 @@
     update_cache: yes
     force_apt_get: yes
 
-- name: add necessary apt keys if host is proxy
+- name: add necessary apt keys
   apt_key:
     url: https://packagecloud.io/netdata/netdata/gpgkey
     state: present
   environment:
-    http_proxy: '{{ proxy.http | default('') }}'
-    https_proxy: '{{ proxy.https | default(proxy.http) }}'
-
-- name: add necessary apt keys if host is not proxy
-  apt_key:
-    url: https://packagecloud.io/netdata/netdata/gpgkey
-    state: present
-  environment:
-    http_proxy: '{{ proxy.http | default('') }}'
-    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+    http_proxy: '{{ proxy.http }}'
+    https_proxy: '{{ proxy.https }}'
 
 - name: add netdata necessary repositories
   apt_repository:
@@ -34,8 +26,8 @@
     - "deb https://packagecloud.io/netdata/netdata/debian/ {{ ansible_distribution_release }} main"
     - "deb-src https://packagecloud.io/netdata/netdata/debian/ {{ ansible_distribution_release }} main"
   environment:
-    http_proxy: '{{ proxy.http | default('') }}'
-    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+    http_proxy: '{{ proxy.http }}'
+    https_proxy: '{{ proxy.https }}'
 
 - name: install netdata package
   apt:
@@ -43,8 +35,8 @@
     force_apt_get: yes
     update_cache: yes
   environment:
-    http_proxy: '{{ proxy.http | default('') }}'
-    https_proxy: '{{ proxy.https | default(proxy.http) }}'
+    http_proxy: '{{ proxy.http }}'
+    https_proxy: '{{ proxy.https }}'
 
 - name: configure netdata
   template:
